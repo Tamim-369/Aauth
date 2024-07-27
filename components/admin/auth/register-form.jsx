@@ -49,7 +49,7 @@ const AdminRegisterForm = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
+    const token = localStorage.getItem("authToken");
     if (token && token !== "") {
       router.push("/admin");
     }

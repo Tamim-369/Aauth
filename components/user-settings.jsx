@@ -33,8 +33,9 @@ const UserSettings = () => {
       return;
     }
 
-    const adminToken = localStorage.getItem("adminToken");
-    if (!adminToken && formData.role === "Admin") {
+    const authToken = localStorage.getItem("authToken");
+    const { role } = jwtDecode(authToken);
+    if (role !== "Admin" && formData.role === "Admin") {
       setError("Admin token not found. Please log in again.");
       setLoading(false);
       return;
@@ -68,7 +69,7 @@ const UserSettings = () => {
         if (formData.role === "Admin") {
           if (data.token) {
             const token = data.token;
-            localStorage.setItem("adminToken", token);
+            localStorage.setItem("authToken", token);
           }
         }
       }
@@ -89,13 +90,14 @@ const UserSettings = () => {
   };
 
   useEffect(() => {
-    if (
-      !localStorage.getItem("adminToken") &&
-      !localStorage.getItem("userToken")
-    ) {
+    const authToken = localStorage.getItem("authToken");
+    const { role, email } = jwtDecode(authToken); // Move this inside useEffect
+
+    if (role !== "Admin") {
       router.push("/admin/auth/login");
       return;
     }
+
     const getUserData = async (email, role) => {
       try {
         const response = await fetch(`/api/users/${email}`);
@@ -111,24 +113,19 @@ const UserSettings = () => {
     };
 
     if (window.location.pathname === "/admin/settings") {
-      const adminToken = localStorage.getItem("adminToken");
-      if (adminToken) {
-        const { email } = jwtDecode(adminToken);
+      if (role === "Admin") {
         getUserData(email, "Admin");
       } else {
         setError("Admin token not found");
       }
     } else {
-      const userToken = localStorage.getItem("userToken");
-      if (userToken) {
-        const { email } = jwtDecode(userToken);
+      if (role === "User") {
         getUserData(email, "User");
       } else {
         setError("User token not found");
       }
     }
-    console.log(jwtDecode(localStorage.getItem("adminToken")));
-  }, []);
+  }, [router]); // Add router to the dependency array
 
   return (
     <div className="mx-auto my-auto w-full flex justify-center items-center">

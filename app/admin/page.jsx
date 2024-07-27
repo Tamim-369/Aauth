@@ -1,5 +1,6 @@
 "use client";
 
+import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -7,9 +8,9 @@ import { useEffect } from "react";
 export default function AdminPage() {
   const router = useRouter();
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    if (token && token !== "" && token !== null && token !== undefined) {
-      router.push("/admin");
+    const { role } = jwtDecode(localStorage.getItem("authToken"));
+    if (role === "Admin") {
+      // router.push("/admin");
     } else {
       router.push("/admin/auth/login");
     }

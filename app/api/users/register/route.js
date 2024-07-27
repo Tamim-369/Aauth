@@ -39,7 +39,7 @@ export async function POST(request) {
     // Update user with new name and hashed password
     await User.findOneAndUpdate(
       { email },
-      { name, password: hashedPassword }, // Update with hashed password
+      { name, password: hashedPassword, verified: true }, // Update with hashed password
       {
         new: true, // Return the updated document
       }

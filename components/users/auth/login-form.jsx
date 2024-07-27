@@ -6,13 +6,13 @@ import FormError from "../../form-error";
 import FormSuccess from "../../form-success";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import AdminVerifyCode from "./verify-code";
+import VerifyCode from "./verify-code";
+import { jwtDecode } from "jwt-decode";
 
-const AdminLoginForm = () => {
+const LoginForm = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    role: "Admin",
   });
   const router = useRouter();
   const [error, setError] = useState(null);
@@ -26,7 +26,7 @@ const AdminLoginForm = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/admin/auth/login", {
+      const response = await fetch("/api/users/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,18 +55,21 @@ const AdminLoginForm = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    if (token && token !== "") {
-      router.push("/admin");
-    } else {
-      router.push("/admin/auth/login");
+    const authToken = localStorage.getItem("authToken");
+    if (authToken) {
+      const { role } = jwtDecode(authToken);
+      if (role) {
+        router.push(role == "Admin" ? "/admin" : authToken);
+      } else {
+        router.push("/users/auth/login");
+      }
     }
   }, []);
 
   return (
     <>
       {codeSent ? (
-        <AdminVerifyCode formData={formData} responseToken={responseToken} />
+        <VerifyCode formData={formData} responseToken={responseToken} />
       ) : (
         <form onSubmit={handleSubmit} className="w-full">
           <div className="flex flex-col mb-5 justify-center items-center">
@@ -126,18 +129,10 @@ const AdminLoginForm = () => {
           </div>
           <FormError message={error} />
           <FormSuccess message={success} />
-          <div className="mt-5 flex justify-center items-center text-sm">
-            <p>
-              Don't have an account?{" "}
-              <Link href="/admin/auth/register" className="text-primary">
-                Create account
-              </Link>
-            </p>
-          </div>
         </form>
       )}
     </>
   );
 };
 
-export default AdminLoginForm;
+export default LoginForm;

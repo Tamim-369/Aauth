@@ -1,21 +1,13 @@
-import mongoose, { Schema } from "mongoose";
+// models/Log.js
+const mongoose = require("mongoose");
 
-const logsSchema = new Schema({
-  email: {
-    type: String,
-    required: [true, "Email is required"],
-  },
-  Log: {
-    type: String,
-    required: [true, "Log is required"],
-  },
-  date: {
-    type: Date,
-    default: Date.now,
-  },
+const LogSchema = new mongoose.Schema({
+  time: String,
+  url: String,
+  // headers: Object,
+  // method: String,
 });
 
-// Check if the model already exists before creating a new one
-const Logs = mongoose.models.Logs || mongoose.model("Logs", logsSchema);
+const Log = mongoose.models.Log || mongoose.model("Log", LogSchema);
 
-export default Logs;
+module.exports = Log;

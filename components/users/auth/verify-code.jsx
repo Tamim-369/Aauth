@@ -4,8 +4,10 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import FormError from "../../form-error";
 import FormSuccess from "../../form-success";
+import toast from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
 
-const AdminVerifyCode = ({ formData, responseToken }) => {
+const VerifyCode = ({ formData, responseToken }) => {
   const router = useRouter();
   const [codeData, setCodeData] = useState({
     code: "",
@@ -24,7 +26,7 @@ const AdminVerifyCode = ({ formData, responseToken }) => {
     setCodeLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/admin/auth/verifyCode", {
+      const response = await fetch("/api/users/auth/verifyCode", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -34,14 +36,20 @@ const AdminVerifyCode = ({ formData, responseToken }) => {
       });
       const data = await response.json();
       if (data.success) {
-        localStorage.setItem("adminToken", responseToken);
+        console.log(data.role);
+        localStorage.setItem(`authToken`, responseToken);
         setSuccess(data.message);
-        setTimeout(() => router.refresh(), 500);
-        router.push("/admin");
+        const { role } = jwtDecode(localStorage.getItem("authToken"));
+        if (role === "Admin") {
+          router.push("/admin");
+        } else if (role === "User") {
+          router.push("/");
+        }
       } else {
         setError(data.message);
       }
     } catch (err) {
+      console.log(err);
       setError("An error occurred. Please try again.");
     } finally {
       setCodeLoading(false);
@@ -94,4 +102,4 @@ const AdminVerifyCode = ({ formData, responseToken }) => {
   );
 };
 
-export default AdminVerifyCode;
+export default VerifyCode;

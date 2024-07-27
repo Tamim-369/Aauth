@@ -1,6 +1,16 @@
-import Link from "next/link";
+"use client";
 
-export default async function Home() {
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+export default function Home() {
+  const router = useRouter();
+  useEffect(() => {
+    if (!localStorage.getItem("authToken")) {
+      router.push("/users/auth/login");
+    }
+  }, []);
   return (
     <main className={`flex h-full flex-col items-center justify-center `}>
       <div className={`space-y-6`}>
@@ -11,9 +21,15 @@ export default async function Home() {
           User authentication and authorization system
         </p>
         <div>
-          <Link href={"/auth/login"}>
-            <button className="btn-secondary">Log In</button>
-          </Link>
+          <button
+            onClick={() => {
+              localStorage.removeItem("authToken");
+              router.push("/users/auth/login");
+            }}
+            className="btn-secondary"
+          >
+            Log out
+          </button>
         </div>
       </div>
     </main>

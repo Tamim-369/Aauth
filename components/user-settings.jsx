@@ -70,6 +70,14 @@ const UserSettings = () => {
           if (data.token) {
             const token = data.token;
             localStorage.setItem("authToken", token);
+            setFormData({
+              _id: "",
+              name: "",
+              email: "",
+              existingPassword: "",
+              newPassword: "",
+              role: "",
+            });
           }
         }
       }
@@ -92,10 +100,18 @@ const UserSettings = () => {
   useEffect(() => {
     const authToken = localStorage.getItem("authToken");
     const { role, email } = jwtDecode(authToken); // Move this inside useEffect
-
-    if (role !== "Admin") {
-      router.push("/admin/auth/login");
-      return;
+    if (window.location.pathname === "/admin/settings") {
+      if (role !== "Admin") {
+        setError("Invalid role");
+        router.push("/admin/auth/login");
+        return;
+      }
+    } else if (window.location.pathname === "/settings") {
+      if (role !== "User") {
+        setError("Invalid role");
+        router.push("/admin/auth/login");
+        return;
+      }
     }
 
     const getUserData = async (email, role) => {
@@ -149,24 +165,25 @@ const UserSettings = () => {
               value={formData.name}
             />
           </div>
-          <div
-            className={`${
-              formData.role === "Admin" ? "flex" : "hidden"
-            } flex-col justify-start items-start gap-2 mb-4`}
-          >
-            <label htmlFor="email" className="w-full">
-              Your Email
-            </label>
-            <input
-              type="email"
-              className="bg-slate-100 border-2 transition-all p-2 rounded-md w-full focus:outline-none focus:border-primary"
-              placeholder="name@company.com"
-              name="email"
-              id="email"
-              onChange={handleChange}
-              value={formData.email}
-            />
-          </div>
+          {formData.role == "Admin" && (
+            <div
+              className={`flex flex-col justify-start items-start gap-2 mb-4`}
+            >
+              <label htmlFor="email" className="w-full">
+                Your Email
+              </label>
+              <input
+                type="email"
+                className="bg-slate-100 border-2 transition-all p-2 rounded-md w-full focus:outline-none focus:border-primary"
+                placeholder="name@company.com"
+                name="email"
+                id="email"
+                onChange={handleChange}
+                value={formData.email}
+              />
+            </div>
+          )}
+
           <div className="flex flex-col justify-start items-start gap-2 mb-4">
             <label htmlFor="existingPassword" className="w-full">
               Password
@@ -197,13 +214,11 @@ const UserSettings = () => {
           </div>
         </div>
         <div className="flex w-full justify-between items-center">
-          <Link href={"/admin"}>
-            <button
-              type="button"
-              className="btn-secondary flex justify-center items-center gap-2 w-full"
-            >
-              Cancel
-            </button>
+          <Link
+            href={`${formData.role == "Admin" ? "/admin" : "/"}`}
+            className="btn-secondary flex justify-center items-center gap-2 "
+          >
+            Cancel
           </Link>
           <button
             type="submit"

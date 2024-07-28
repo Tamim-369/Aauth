@@ -20,7 +20,7 @@ export default function Home() {
         <p className={`text-black  text-lg`}>
           User authentication and authorization system
         </p>
-        <div>
+        <div className="flex gap-2">
           <button
             onClick={() => {
               localStorage.removeItem("authToken");
@@ -30,6 +30,9 @@ export default function Home() {
           >
             Log out
           </button>
+          <Link href={"/settings"} className="btn-secondary">
+            Settings
+          </Link>
         </div>
       </div>
     </main>

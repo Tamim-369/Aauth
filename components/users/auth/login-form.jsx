@@ -59,7 +59,7 @@ const LoginForm = () => {
     if (authToken) {
       const { role } = jwtDecode(authToken);
       if (role) {
-        router.push(role == "Admin" ? "/admin" : "/user");
+        router.push(role == "Admin" ? "/admin" : "/");
       } else {
         router.push("/users/auth/login");
       }

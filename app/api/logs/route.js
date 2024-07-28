@@ -14,3 +14,8 @@ export async function POST(request) {
   await newLog.save();
   return NextResponse.json({ success: true });
 }
+export async function GET(request) {
+  await connectDB();
+  const logs = await Log.find({});
+  return NextResponse.json({ logs: logs, success: true });
+}
